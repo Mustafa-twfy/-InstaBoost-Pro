@@ -64,6 +64,27 @@
 
     </LinearLayout>
 
+    <!-- Refresh Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="#2D2D2D">
+
+        <TextView
+            android:id="@+id/btnRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔄 تحديث الصور"
+            android:textSize="14sp"
+            android:textColor="#833AB4"
+            android:background="?attr/selectableItemBackground"
+            android:padding="8dp"
+            android:layout_gravity="center" />
+
+    </LinearLayout>
+
     <!-- Progress Bar -->
     <LinearLayout
         android:id="@+id/loadingLayout"

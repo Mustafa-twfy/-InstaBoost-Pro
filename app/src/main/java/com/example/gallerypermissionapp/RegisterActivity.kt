@@ -47,10 +47,12 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun performRegistration() {
+        val fullName = findViewById<EditText>(R.id.etFullName).text.toString().trim()
         val email = etEmail.text.toString().trim()
         val password = etPassword.text.toString().trim()
+        val confirmPassword = findViewById<EditText>(R.id.etConfirmPassword).text.toString().trim()
 
-        if (email.isEmpty() || password.isEmpty()) {
+        if (fullName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             Toast.makeText(this, getString(R.string.error_fill_fields), Toast.LENGTH_SHORT).show()
             return
         }
@@ -65,8 +67,14 @@ class RegisterActivity : AppCompatActivity() {
             return
         }
 
+        if (password != confirmPassword) {
+            findViewById<EditText>(R.id.etConfirmPassword).error = getString(R.string.error_passwords_not_match)
+            return
+        }
+
         // Simplified registration for testing - always succeeds
         Toast.makeText(this@RegisterActivity, getString(R.string.success_register), Toast.LENGTH_LONG).show()
+        
         // Go back to login screen after successful registration
         finish()
     }

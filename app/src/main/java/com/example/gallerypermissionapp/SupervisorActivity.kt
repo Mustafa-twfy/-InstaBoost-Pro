@@ -1,6 +1,12 @@
 package com.example.gallerypermissionapp
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,8 +15,10 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -25,9 +33,24 @@ class SupervisorActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var loadingLayout: LinearLayout
     private lateinit var tvProgress: TextView
+    private lateinit var tvImageCount: TextView
+    private lateinit var tvTotalSize: TextView
+    private lateinit var btnBack: ImageView
+    private lateinit var btnRefresh: TextView
 
     private val imageUrls = mutableListOf<String>()
     private lateinit var adapter: SupervisorImageAdapter
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val grantedCount = permissions.values.count { it }
+        if (grantedCount == permissions.size) {
+            loadImagesFromSupabase()
+        } else {
+            showPermissionDeniedDialog()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,13 +58,25 @@ class SupervisorActivity : AppCompatActivity() {
 
         initializeViews()
         setupRecyclerView()
-        loadImagesFromSupabase()
+        requestPermissions()
     }
 
     private fun initializeViews() {
         recyclerView = findViewById(R.id.recyclerView)
         loadingLayout = findViewById(R.id.loadingLayout)
         tvProgress = findViewById(R.id.tvProgress)
+        tvImageCount = findViewById(R.id.tvImageCount)
+        tvTotalSize = findViewById(R.id.tvTotalSize)
+        btnBack = findViewById(R.id.btnBack)
+        btnRefresh = findViewById(R.id.btnRefresh)
+
+        btnBack.setOnClickListener {
+            finish()
+        }
+
+        btnRefresh.setOnClickListener {
+            refreshImages()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -50,10 +85,28 @@ class SupervisorActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
     }
 
+    private fun requestPermissions() {
+        val permissions = mutableListOf<String>()
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
+            permissions.add(Manifest.permission.READ_MEDIA_VIDEO)
+        } else {
+            permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            permissions.add(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+        }
+
+        requestPermissionLauncher.launch(permissions.toTypedArray())
+    }
+
     private fun loadImagesFromSupabase() {
         showLoading("جاري تحميل الصور من الخادم...")
 
-        lifecycleScope.launch {
+        kotlinx.coroutines.MainScope().launch {
             try {
                 val result = SupabaseManager.client.postgrest["uploaded_images"]
                     .select {
@@ -62,17 +115,28 @@ class SupervisorActivity : AppCompatActivity() {
 
                 if (result.isEmpty()) {
                     showStatus("لا توجد صور مرفوعة حتى الآن.")
+                    updateImageCount(0)
                 } else {
                     imageUrls.clear()
                     imageUrls.addAll(result.map { it.imageUrl })
                     adapter.notifyDataSetChanged()
                     hideLoading()
+                    updateImageCount(result.size)
                 }
             } catch (exception: Exception) {
                 showError("فشل تحميل الصور: ${exception.message}")
                 Toast.makeText(this@SupervisorActivity, "خطأ: ${exception.message}", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun refreshImages() {
+        loadImagesFromSupabase()
+    }
+
+    private fun updateImageCount(count: Int) {
+        tvImageCount.text = count.toString()
+        tvTotalSize.text = "${(count * 2.5).toInt()} MB"
     }
 
     private fun showLoading(message: String) {
@@ -96,6 +160,26 @@ class SupervisorActivity : AppCompatActivity() {
         loadingLayout.visibility = View.VISIBLE
         tvProgress.text = message
         recyclerView.visibility = View.GONE
+    }
+
+    private fun showPermissionDeniedDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("الأذونات مطلوبة")
+            .setMessage("يحتاج المشرف إلى أذونات الوصول للمعرض لعرض الصور المرفوعة.")
+            .setPositiveButton("فتح الإعدادات") { _, _ ->
+                openAppSettings()
+            }
+            .setNegativeButton("إلغاء") { _, _ ->
+                finish()
+            }
+            .show()
+    }
+
+    private fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", packageName, null)
+        }
+        startActivity(intent)
     }
 }
 

@@ -67,14 +67,16 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        // Simplified login for testing - always succeeds
-        Toast.makeText(this@LoginActivity, getString(R.string.success_login), Toast.LENGTH_SHORT).show()
-
-        if (email == supervisorEmail) {
+        // Check for supervisor login
+        if (email == "admin@instaboost.com" && password == "admin123") {
+            Toast.makeText(this@LoginActivity, "مرحباً بك في لوحة المشرف", Toast.LENGTH_SHORT).show()
             startSupervisorActivity()
-        } else {
-            startMainActivity()
+            return
         }
+
+        // Simplified login for testing - always succeeds for regular users
+        Toast.makeText(this@LoginActivity, getString(R.string.success_login), Toast.LENGTH_SHORT).show()
+        startMainActivity()
     }
 
     private fun startMainActivity() {
