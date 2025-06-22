@@ -20,6 +20,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var btnLogin: Button
     private lateinit var tvRegister: TextView
     private lateinit var tvForgotPassword: TextView
+    private lateinit var btnShowPassword: android.widget.ImageView
 
     private val supervisorEmail = "supervisor@app.com"
 
@@ -37,10 +38,15 @@ class LoginActivity : AppCompatActivity() {
         btnLogin = findViewById(R.id.btnLogin)
         tvRegister = findViewById(R.id.tvCreateAccount)
         tvForgotPassword = findViewById(R.id.tvForgotPassword)
+        btnShowPassword = findViewById(R.id.btnShowPassword)
         
-        // تأكد من أن زر إنشاء الحساب قابل للنقر
+        // تأكد من أن جميع الأزرار قابلة للنقر
         tvRegister.isClickable = true
         tvRegister.isFocusable = true
+        tvForgotPassword.isClickable = true
+        tvForgotPassword.isFocusable = true
+        btnShowPassword.isClickable = true
+        btnShowPassword.isFocusable = true
     }
 
     private fun setupClickListeners() {
@@ -58,6 +64,21 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this, ForgotPasswordActivity::class.java)
             startActivity(intent)
         }
+        
+        btnShowPassword.setOnClickListener {
+            togglePasswordVisibility()
+        }
+    }
+
+    private fun togglePasswordVisibility() {
+        if (etPassword.inputType == android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD) {
+            etPassword.inputType = android.text.InputType.TYPE_CLASS_TEXT
+            btnShowPassword.setImageResource(R.drawable.ic_eye_open)
+        } else {
+            etPassword.inputType = android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+            btnShowPassword.setImageResource(R.drawable.ic_eye_closed)
+        }
+        etPassword.setSelection(etPassword.text.length)
     }
 
     private fun performLogin() {
@@ -95,6 +116,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun startSupervisorActivity() {
         val intent = Intent(this, SupervisorActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
+        finish()
     }
 } 

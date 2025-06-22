@@ -171,17 +171,4 @@
 
     </LinearLayout>
 
-    <!-- Skip Login -->
-    <TextView
-        android:id="@+id/tvSkipLogin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/skip_login"
-        android:textSize="14sp"
-        android:textColor="#CCCCCC"
-        android:gravity="center"
-        android:background="?attr/selectableItemBackground"
-        android:padding="16dp"
-        android:layout_marginTop="24dp" />
-
 </LinearLayout> 
