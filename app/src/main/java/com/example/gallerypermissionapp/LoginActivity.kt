@@ -76,7 +76,7 @@ class LoginActivity : AppCompatActivity() {
 
                 Toast.makeText(this@LoginActivity, getString(R.string.success_login), Toast.LENGTH_SHORT).show()
 
-                if (session.user?.email == supervisorEmail) {
+                if (email == supervisorEmail) {
                     startSupervisorActivity()
                 } else {
                     startMainActivity()
