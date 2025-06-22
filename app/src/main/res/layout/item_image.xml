@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:background="#E0E0E0"
-        android:contentDescription="@string/image_item_desc" />
+        android:contentDescription="صورة" />
 
     <ProgressBar
         android:id="@+id/progressBar"
