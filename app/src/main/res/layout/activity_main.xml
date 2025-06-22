@@ -1,227 +1,282 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#833AB4">
+    android:background="@drawable/login_gradient">
 
-    <!-- Header -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="32dp"
-        android:layout_marginTop="40dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/welcome_title"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:gravity="center"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/welcome_subtitle"
-            android:textSize="16sp"
-            android:textColor="#E0E0E0"
-            android:gravity="center"
-            android:lineSpacingExtra="4dp" />
-
-    </LinearLayout>
-
-    <!-- Account Status Card -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginBottom="24dp"
-        android:background="@drawable/card_background"
-        android:elevation="8dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/account_status"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:gravity="center"
-            android:layout_marginBottom="12dp" />
-
-        <TextView
-            android:id="@+id/tvPermissionStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/permission_status_checking"
-            android:textSize="14sp"
-            android:textColor="#666666"
-            android:gravity="center"
-            android:padding="12dp"
-            android:background="@drawable/status_background"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/tvPermissionDetails"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="حالة الربط: جاري الفحص"
-            android:textSize="12sp"
-            android:textColor="#888888"
-            android:gravity="center" />
-
-    </LinearLayout>
-
-    <!-- Action Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="24dp">
 
-        <Button
-            android:id="@+id/btnSelectImage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/connect_account"
-            android:textSize="16sp"
-            android:padding="16dp"
-            android:background="@drawable/instagram_button"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/btnViewAllImages"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/analyze_content"
-            android:textSize="16sp"
-            android:padding="16dp"
-            android:background="@drawable/secondary_button"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="12dp"
-            android:enabled="false" />
-
-        <Button
-            android:id="@+id/btnSupervisor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/supervisor_interface"
-            android:textSize="16sp"
-            android:padding="16dp"
-            android:background="@drawable/supervisor_button"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="24dp"
-            android:enabled="false" />
-
-        <!-- Feature Cards -->
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
 
-            <LinearLayout
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_launcher_foreground"
+                android:background="@drawable/profile_image_background"
+                android:contentDescription="Logo" />
+
+            <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="16dp"
-                android:background="@drawable/feature_card_background">
+                android:text="@string/app_name"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="16dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="👥"
-                    android:textSize="24sp"
-                    android:gravity="center" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/boost_followers"
-                    android:textSize="12sp"
-                    android:textColor="#FFFFFF"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
+            <Button
+                android:id="@+id/btnSupervisor"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:orientation="vertical"
+                android:text="المشرف"
+                android:textSize="12sp"
+                android:background="@drawable/supervisor_button"
+                android:textColor="#FFFFFF"
+                android:enabled="false" />
+
+        </LinearLayout>
+
+        <!-- Welcome Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="مرحباً بك في InstaBoost Pro"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
                 android:gravity="center"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="احصل على متابعين حقيقيين ولايكات مجانية لانستغرام"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- Instagram Account Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ربط حساب انستغرام"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/etInstagramUsername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="اسم المستخدم (بدون @)"
+                android:inputType="text"
                 android:padding="16dp"
-                android:background="@drawable/feature_card_background">
+                android:background="@drawable/edit_text_background"
+                android:layout_marginBottom="12dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="❤️"
-                    android:textSize="24sp"
-                    android:gravity="center" />
+            <Button
+                android:id="@+id/btnConnectInstagram"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ربط الحساب"
+                android:textSize="16sp"
+                android:padding="16dp"
+                android:background="@drawable/instagram_button"
+                android:textColor="#FFFFFF"
+                android:enabled="false" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/boost_likes"
-                    android:textSize="12sp"
-                    android:textColor="#FFFFFF"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp" />
+            <TextView
+                android:id="@+id/tvAccountStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="❌ لم يتم ربط حساب انستغرام"
+                android:textSize="14sp"
+                android:textColor="#FF0000"
+                android:gravity="center"
+                android:layout_marginTop="12dp" />
 
-            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Boost Features Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ميزات الرشق"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/btnBoostFollowers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔄 رشق المتابعين"
+                android:textSize="16sp"
+                android:padding="16dp"
+                android:background="@drawable/feature_card_background"
+                android:textColor="#FFFFFF"
+                android:enabled="false"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btnBoostLikes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="❤️ رشق اللايكات"
+                android:textSize="16sp"
+                android:padding="16dp"
+                android:background="@drawable/feature_card_background"
+                android:textColor="#FFFFFF"
+                android:enabled="false"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvBoostStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+        <!-- Permission Status Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="حالة ربط الحساب"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:id="@+id/tvPermissionStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/permission_status_required"
+                android:textSize="16sp"
+                android:textColor="#FF0000"
+                android:gravity="center"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvPermissionDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="حالة الربط: 0/3"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/btnSelectImage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/grant_permissions"
+                android:textSize="16sp"
+                android:padding="16dp"
+                android:background="@drawable/button_background"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
+        <!-- Content Analysis Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="تحليل المحتوى"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="16dp" />
+
+            <ImageView
+                android:id="@+id/imgPreview"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_profile_placeholder"
+                android:background="@drawable/image_border"
+                android:contentDescription="صورة الملف الشخصي"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/btnViewAllImages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/view_all_images"
+                android:textSize="16sp"
+                android:padding="16dp"
+                android:background="@drawable/button_background_secondary"
+                android:textColor="#FFFFFF"
+                android:enabled="false" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-    <!-- Profile Image Preview -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="24dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="صورة الملف الشخصي"
-            android:textSize="14sp"
-            android:textColor="#E0E0E0"
-            android:layout_marginBottom="12dp" />
-
-        <ImageView
-            android:id="@+id/imgPreview"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:scaleType="centerCrop"
-            android:background="@drawable/profile_image_background"
-            android:src="@drawable/ic_profile_placeholder"
-            android:contentDescription="صورة الملف الشخصي" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/select_image_hint"
-            android:textSize="12sp"
-            android:textColor="#CCCCCC"
-            android:gravity="center"
-            android:layout_marginTop="12dp" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</ScrollView>
