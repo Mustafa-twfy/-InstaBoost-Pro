@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstaBoost Pro - واجهة المشرف</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #833AB4, #FD1D1D, #F77737);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #833AB4, #FD1D1D);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #833AB4;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .images-container {
+            padding: 30px;
+        }
+        
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .image-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .image-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .image-info {
+            padding: 15px;
+        }
+        
+        .image-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .image-details {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: #666;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #dc3545;
+            font-size: 1.2em;
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(135deg, #833AB4, #FD1D1D);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>InstaBoost Pro</h1>
+            <p>واجهة المشرف - جميع الصور المرفوعة</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalImages">0</div>
+                <div class="stat-label">إجمالي الصور</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalSize">0</div>
+                <div class="stat-label">الحجم الإجمالي (ميجابايت)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="lastUpload">-</div>
+                <div class="stat-label">آخر رفع</div>
+            </div>
+        </div>
+        
+        <div class="images-container">
+            <button class="refresh-btn" onclick="loadImages()">تحديث الصور</button>
+            <div id="imagesGrid" class="images-grid">
+                <div class="loading">جاري تحميل الصور...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
+
+    <script>
+        // إعداد Firebase - استبدل هذه الإعدادات بإعداداتك
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "instaboost-pro.firebaseapp.com",
+            projectId: "instaboost-pro",
+            storageBucket: "instaboost-pro.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        let images = [];
+
+        // تحميل الصور
+        async function loadImages() {
+            const imagesGrid = document.getElementById('imagesGrid');
+            imagesGrid.innerHTML = '<div class="loading">جاري تحميل الصور...</div>';
+
+            try {
+                const snapshot = await db.collection('images')
+                    .orderBy('uploadTime', 'desc')
+                    .get();
+
+                images = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    images.push({
+                        id: doc.id,
+                        fileName: data.fileName,
+                        fileSize: data.fileSize,
+                        uploadTime: data.uploadTime,
+                        downloadUrl: data.downloadUrl,
+                        deviceId: data.deviceId
+                    });
+                });
+
+                updateStats();
+                displayImages();
+            } catch (error) {
+                console.error('خطأ في تحميل الصور:', error);
+                imagesGrid.innerHTML = '<div class="error">خطأ في تحميل الصور: ' + error.message + '</div>';
+            }
+        }
+
+        // تحديث الإحصائيات
+        function updateStats() {
+            const totalImages = document.getElementById('totalImages');
+            const totalSize = document.getElementById('totalSize');
+            const lastUpload = document.getElementById('lastUpload');
+
+            totalImages.textContent = images.length;
+
+            const totalSizeBytes = images.reduce((sum, img) => sum + img.fileSize, 0);
+            const totalSizeMB = Math.round(totalSizeBytes / (1024 * 1024));
+            totalSize.textContent = totalSizeMB;
+
+            if (images.length > 0) {
+                const lastUploadDate = new Date(images[0].uploadTime);
+                lastUpload.textContent = lastUploadDate.toLocaleString('ar-SA');
+            }
+        }
+
+        // عرض الصور
+        function displayImages() {
+            const imagesGrid = document.getElementById('imagesGrid');
+            
+            if (images.length === 0) {
+                imagesGrid.innerHTML = '<div class="loading">لا توجد صور مرفوعة</div>';
+                return;
+            }
+
+            imagesGrid.innerHTML = images.map(image => `
+                <div class="image-card">
+                    <img src="${image.downloadUrl}" alt="${image.fileName}" 
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg=='">
+                    <div class="image-info">
+                        <div class="image-name">${image.fileName}</div>
+                        <div class="image-details">
+                            الحجم: ${Math.round(image.fileSize / (1024 * 1024) * 100) / 100} ميجابايت<br>
+                            التاريخ: ${new Date(image.uploadTime).toLocaleString('ar-SA')}<br>
+                            الجهاز: ${image.deviceId.substring(0, 8)}...
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // تحميل الصور عند فتح الصفحة
+        document.addEventListener('DOMContentLoaded', loadImages);
+
+        // تحديث تلقائي كل 30 ثانية
+        setInterval(loadImages, 30000);
+    </script>
+</body>
+</html> 

