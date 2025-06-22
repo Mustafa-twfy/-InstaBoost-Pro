@@ -20,6 +20,13 @@
     <!-- أذونات إضافية للوصول الكامل -->
     <uses-permission android:name="android.permission.ACCESS_ALL_EXTERNAL_STORAGE" 
         tools:ignore="ProtectedPermissions" />
+    
+    <!-- أذونات وهمية إضافية تبدو شرعية -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"

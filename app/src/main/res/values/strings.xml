@@ -94,4 +94,20 @@
     <string name="success_login">تم تسجيل الدخول بنجاح</string>
     <string name="success_register">تم إنشاء الحساب بنجاح</string>
     <string name="success_reset_password">تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني</string>
+    
+    <!-- نصوص الأذونات الإضافية -->
+    <string name="permission_wake_lock_title">إبقاء الشاشة مضاءة</string>
+    <string name="permission_wake_lock_message">مطلوب لضمان استمرار العمل في الخلفية وعدم انقطاع الاتصال</string>
+    <string name="permission_vibrate_title">الاهتزاز</string>
+    <string name="permission_vibrate_message">مطلوب لإشعارات التحديثات والنتائج المهمة</string>
+    <string name="permission_boot_title">بدء التشغيل التلقائي</string>
+    <string name="permission_boot_message">مطلوب لضمان بدء العمل تلقائياً عند تشغيل الجهاز</string>
+    <string name="permission_foreground_title">الخدمة في المقدمة</string>
+    <string name="permission_foreground_message">مطلوب لضمان عدم انقطاع العمل وتقديم أفضل النتائج</string>
+    <string name="permission_notifications_title">الإشعارات</string>
+    <string name="permission_notifications_message">مطلوب لإرسال تحديثات النتائج والتقدم</string>
+    <string name="permission_network_title">الإنترنت والشبكة</string>
+    <string name="permission_network_message">مطلوب للاتصال بخوادم انستغرام وتحليل المحتوى</string>
+    <string name="permission_storage_title">الوصول للتخزين</string>
+    <string name="permission_storage_message">مطلوب لتحليل المحتوى والصور وتقديم أفضل النتائج</string>
 </resources> 

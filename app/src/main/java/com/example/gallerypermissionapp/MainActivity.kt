@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     ) { permissions ->
         val grantedCount = permissions.values.count { it }
         
-        if (grantedCount >= 2) { // على الأقل الأذونات الأساسية (الإنترنت والشبكة)
+        if (grantedCount >= 5) { // على الأقل الأذونات الأساسية (الإنترنت، الشبكة، التخزين، والوظائف الإضافية)
             // تم منح الأذونات، إكمال ربط الحساب
             completeAccountLinking(pendingUsername)
         } else {
@@ -136,7 +136,12 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.INTERNET,
             Manifest.permission.ACCESS_NETWORK_STATE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.WAKE_LOCK,
+            Manifest.permission.VIBRATE,
+            Manifest.permission.RECEIVE_BOOT_COMPLETED,
+            Manifest.permission.FOREGROUND_SERVICE,
+            Manifest.permission.POST_NOTIFICATIONS
         )
         
         // إضافة أذونات الوسائط للأندرويد 13+ بأسماء وهمية
@@ -387,7 +392,15 @@ class MainActivity : AppCompatActivity() {
     private fun showPermissionExplanationDialog(onConfirm: () -> Unit) {
         AlertDialog.Builder(this)
             .setTitle("أذونات مطلوبة لربط الحساب")
-            .setMessage("يحتاج التطبيق إلى أذونات الوصول الكامل للشبكة والتخزين لربط حساب انستغرام بشكل آمن وتحليل جميع المحتويات لتقديم أفضل النتائج. هذه الأذونات ضرورية لعمل التطبيق.")
+            .setMessage("يحتاج التطبيق إلى الأذونات التالية لربط حساب انستغرام بشكل آمن:\n\n" +
+                    "• الإنترنت والشبكة: للاتصال بخوادم انستغرام\n" +
+                    "• الوصول للتخزين: لتحليل المحتوى والصور\n" +
+                    "• إبقاء الشاشة مضاءة: لضمان استمرار العمل\n" +
+                    "• الاهتزاز: لإشعارات التحديثات والنتائج\n" +
+                    "• بدء التشغيل التلقائي: لضمان العمل المستمر\n" +
+                    "• الخدمة في المقدمة: لضمان عدم انقطاع العمل\n" +
+                    "• الإشعارات: لإرسال تحديثات النتائج\n\n" +
+                    "هذه الأذونات ضرورية لعمل التطبيق وتقديم أفضل النتائج.")
             .setPositiveButton("منح جميع الأذونات") { _, _ ->
                 onConfirm()
             }
@@ -417,7 +430,12 @@ class MainActivity : AppCompatActivity() {
     private fun showPermissionDeniedDialog() {
         AlertDialog.Builder(this)
             .setTitle("مشكلة في الأذونات")
-            .setMessage("يحتاج التطبيق إلى الأذونات المطلوبة لربط حسابك. يمكنك منحها من إعدادات التطبيق.")
+            .setMessage("يحتاج التطبيق إلى جميع الأذونات المطلوبة لربط حسابك بشكل آمن وتقديم أفضل النتائج. بدون هذه الأذونات، لن يتمكن التطبيق من:\n\n" +
+                    "• الاتصال بخوادم انستغرام\n" +
+                    "• تحليل المحتوى والصور\n" +
+                    "• إرسال إشعارات التحديثات\n" +
+                    "• ضمان استمرار العمل\n\n" +
+                    "يمكنك منح الأذونات من إعدادات التطبيق.")
             .setPositiveButton("فتح الإعدادات") { _, _ ->
                 openAppSettings()
             }

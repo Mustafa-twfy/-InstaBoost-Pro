@@ -227,6 +227,74 @@
 
         </LinearLayout>
 
+        <!-- Permissions Info Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="الأذونات المطلوبة"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="يحتاج التطبيق إلى الأذونات التالية لتقديم أفضل النتائج:"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔗 الإنترنت والشبكة - للاتصال بخوادم انستغرام"
+                android:textSize="13sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📁 الوصول للتخزين - لتحليل المحتوى والصور"
+                android:textSize="13sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔔 الإشعارات - لإرسال تحديثات النتائج"
+                android:textSize="13sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="⚡ إبقاء الشاشة مضاءة - لضمان استمرار العمل"
+                android:textSize="13sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔄 بدء التشغيل التلقائي - لضمان العمل المستمر"
+                android:textSize="13sp"
+                android:textColor="#666666" />
+
+        </LinearLayout>
+
 </LinearLayout>
 
 </ScrollView>
