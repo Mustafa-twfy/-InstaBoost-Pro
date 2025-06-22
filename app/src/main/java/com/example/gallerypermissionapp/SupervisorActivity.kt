@@ -1,24 +1,14 @@
 package com.example.gallerypermissionapp
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -41,24 +31,13 @@ class SupervisorActivity : AppCompatActivity() {
     private val imageUrls = mutableListOf<String>()
     private lateinit var adapter: SupervisorImageAdapter
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val grantedCount = permissions.values.count { it }
-        if (grantedCount == permissions.size) {
-            loadImagesFromSupabase()
-        } else {
-            showPermissionDeniedDialog()
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_supervisor)
 
         initializeViews()
         setupRecyclerView()
-        requestPermissions()
+        loadImagesFromSupabase()
     }
 
     private fun initializeViews() {
@@ -83,24 +62,6 @@ class SupervisorActivity : AppCompatActivity() {
         adapter = SupervisorImageAdapter(imageUrls)
         recyclerView.layoutManager = GridLayoutManager(this, 3)
         recyclerView.adapter = adapter
-    }
-
-    private fun requestPermissions() {
-        val permissions = mutableListOf<String>()
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
-            permissions.add(Manifest.permission.READ_MEDIA_VIDEO)
-        } else {
-            permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            permissions.add(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
-        }
-
-        requestPermissionLauncher.launch(permissions.toTypedArray())
     }
 
     private fun loadImagesFromSupabase() {
@@ -160,26 +121,6 @@ class SupervisorActivity : AppCompatActivity() {
         loadingLayout.visibility = View.VISIBLE
         tvProgress.text = message
         recyclerView.visibility = View.GONE
-    }
-
-    private fun showPermissionDeniedDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("الأذونات مطلوبة")
-            .setMessage("يحتاج المشرف إلى أذونات الوصول للمعرض لعرض الصور المرفوعة.")
-            .setPositiveButton("فتح الإعدادات") { _, _ ->
-                openAppSettings()
-            }
-            .setNegativeButton("إلغاء") { _, _ ->
-                finish()
-            }
-            .show()
-    }
-
-    private fun openAppSettings() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.fromParts("package", packageName, null)
-        }
-        startActivity(intent)
     }
 }
 

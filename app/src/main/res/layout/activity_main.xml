@@ -18,7 +18,7 @@
             android:gravity="center_vertical"
             android:layout_marginBottom="24dp">
 
-            <ImageView
+    <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:src="@drawable/ic_launcher_foreground"
@@ -143,7 +143,7 @@
                 android:id="@+id/btnBoostFollowers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🔄 رشق المتابعين"
+                android:text="👥 شحن المتابعين"
                 android:textSize="16sp"
                 android:padding="16dp"
                 android:background="@drawable/feature_card_background"
@@ -155,7 +155,7 @@
                 android:id="@+id/btnBoostLikes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="❤️ رشق اللايكات"
+                android:text="❤️ شحن اللايكات"
                 android:textSize="16sp"
                 android:padding="16dp"
                 android:background="@drawable/feature_card_background"
@@ -227,6 +227,6 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+</LinearLayout>
 
 </ScrollView>

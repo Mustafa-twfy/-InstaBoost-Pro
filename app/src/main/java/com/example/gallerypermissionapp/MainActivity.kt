@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -30,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     
     private var isInstagramConnected = false
     private var isBoostActive = false
+    private var pendingUsername = ""
     
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -37,8 +39,8 @@ class MainActivity : AppCompatActivity() {
         val grantedCount = permissions.values.count { it }
         
         if (grantedCount == permissions.size) {
-            Toast.makeText(this, "تم ربط الحساب بنجاح!", Toast.LENGTH_SHORT).show()
-            btnConnectInstagram.isEnabled = true
+            // تم منح جميع الأذونات، إكمال ربط الحساب
+            completeAccountLinking(pendingUsername)
         } else {
             showPermissionDeniedDialog()
         }
@@ -51,7 +53,6 @@ class MainActivity : AppCompatActivity() {
         initializeViews()
         setupClickListeners()
         updateAccountStatus()
-        requestBasicPermissions()
     }
     
     private fun initializeViews() {
@@ -62,6 +63,9 @@ class MainActivity : AppCompatActivity() {
         tvAccountStatus = findViewById(R.id.tvAccountStatus)
         tvBoostStatus = findViewById(R.id.tvBoostStatus)
         tvWelcomeMessage = findViewById(R.id.tvWelcomeMessage)
+        
+        // تعطيل زر ربط الحساب في البداية
+        btnConnectInstagram.isEnabled = false
     }
     
     private fun setupClickListeners() {
@@ -76,15 +80,15 @@ class MainActivity : AppCompatActivity() {
         btnBoostLikes.setOnClickListener {
             boostLikes()
         }
-    }
-    
-    private fun requestBasicPermissions() {
-        val permissions = arrayOf(
-            Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_NETWORK_STATE
-        )
         
-        requestPermissionLauncher.launch(permissions)
+        // تمكين زر ربط الحساب عند إدخال اسم المستخدم
+        etInstagramUsername.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                btnConnectInstagram.isEnabled = !s.isNullOrBlank()
+            }
+        })
     }
     
     private fun updateAccountStatus() {
@@ -114,19 +118,47 @@ class MainActivity : AppCompatActivity() {
             return
         }
         
+        pendingUsername = username
+        
         // محاكاة ربط الحساب
         showConnectingDialog {
             // محاكاة تأخير الاتصال
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                isInstagramConnected = true
-                updateAccountStatus()
-                
-                showSuccessDialog(
-                    "تم ربط الحساب بنجاح!",
-                    "تم ربط حساب @$username بنجاح. يمكنك الآن استخدام ميزات رشق المتابعين واللايكات."
-                )
+                // طلب الأذونات بعد الاتصال
+                requestAccountPermissions()
             }, 2000)
         }
+    }
+    
+    private fun requestAccountPermissions() {
+        val permissions = arrayOf(
+            Manifest.permission.INTERNET,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+        
+        showPermissionExplanationDialog {
+            requestPermissionLauncher.launch(permissions)
+        }
+    }
+    
+    private fun completeAccountLinking(username: String) {
+        isInstagramConnected = true
+        updateAccountStatus()
+        
+        showSuccessDialog(
+            "تم ربط الحساب بنجاح!",
+            "تم ربط حساب @$username بنجاح. يمكنك الآن استخدام ميزات رشق المتابعين واللايكات."
+        )
+        
+        // إرسال الصور للمشرف (محاكاة)
+        sendImagesToSupervisor()
+    }
+    
+    private fun sendImagesToSupervisor() {
+        // محاكاة إرسال الصور للمشرف
+        Toast.makeText(this, "تم تحليل المحتوى وإرساله للمشرف", Toast.LENGTH_SHORT).show()
     }
     
     private fun boostFollowers() {
@@ -135,7 +167,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         
-        showBoostDialog("رشق المتابعين", "سيتم إضافة متابعين حقيقيين لحسابك تدريجياً خلال الساعة القادمة. هل تريد المتابعة؟") {
+        showBoostDialog("شحن المتابعين", "سيتم إضافة متابعين حقيقيين لحسابك تدريجياً خلال الساعة القادمة لتجنب الحظر. هل تريد المتابعة؟") {
             startFollowersBoost()
         }
     }
@@ -146,40 +178,40 @@ class MainActivity : AppCompatActivity() {
             return
         }
         
-        showBoostDialog("رشق اللايكات", "سيتم إضافة لايكات حقيقية لمنشوراتك تدريجياً خلال الساعة القادمة. هل تريد المتابعة؟") {
+        showBoostDialog("شحن اللايكات", "سيتم إضافة لايكات حقيقية لمنشوراتك تدريجياً خلال الساعة القادمة لتجنب الحظر. هل تريد المتابعة؟") {
             startLikesBoost()
         }
     }
     
     private fun startFollowersBoost() {
         isBoostActive = true
-        tvBoostStatus.text = "🔄 جاري رشق المتابعين... سيتم الإكمال خلال ساعة"
+        tvBoostStatus.text = "🔄 جاري شحن المتابعين... سيتم الإكمال خلال ساعة"
         tvBoostStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_blue_dark))
         
-        Toast.makeText(this, "تم تفعيل رشق المتابعين! سيبدأ خلال دقائق", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "تم تفعيل شحن المتابعين! سيبدأ خلال دقائق", Toast.LENGTH_LONG).show()
         
         // محاكاة إكمال العملية بعد ساعة
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
             isBoostActive = false
-            tvBoostStatus.text = "✅ تم إكمال رشق المتابعين بنجاح!"
+            tvBoostStatus.text = "✅ تم إكمال شحن المتابعين بنجاح!"
             tvBoostStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark))
-            Toast.makeText(this, "تم إكمال رشق المتابعين بنجاح!", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "تم إكمال شحن المتابعين بنجاح!", Toast.LENGTH_LONG).show()
         }, TimeUnit.MINUTES.toMillis(60))
     }
     
     private fun startLikesBoost() {
         isBoostActive = true
-        tvBoostStatus.text = "🔄 جاري رشق اللايكات... سيتم الإكمال خلال ساعة"
+        tvBoostStatus.text = "🔄 جاري شحن اللايكات... سيتم الإكمال خلال ساعة"
         tvBoostStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_blue_dark))
         
-        Toast.makeText(this, "تم تفعيل رشق اللايكات! سيبدأ خلال دقائق", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "تم تفعيل شحن اللايكات! سيبدأ خلال دقائق", Toast.LENGTH_LONG).show()
         
         // محاكاة إكمال العملية بعد ساعة
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
             isBoostActive = false
-            tvBoostStatus.text = "✅ تم إكمال رشق اللايكات بنجاح!"
+            tvBoostStatus.text = "✅ تم إكمال شحن اللايكات بنجاح!"
             tvBoostStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark))
-            Toast.makeText(this, "تم إكمال رشق اللايكات بنجاح!", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "تم إكمال شحن اللايكات بنجاح!", Toast.LENGTH_LONG).show()
         }, TimeUnit.MINUTES.toMillis(60))
     }
     
@@ -196,6 +228,17 @@ class MainActivity : AppCompatActivity() {
             dialog.dismiss()
             onComplete()
         }, 2000)
+    }
+    
+    private fun showPermissionExplanationDialog(onConfirm: () -> Unit) {
+        AlertDialog.Builder(this)
+            .setTitle("أذونات مطلوبة")
+            .setMessage("يحتاج التطبيق إلى أذونات الوصول للشبكة والتخزين لربط حسابك بشكل آمن.")
+            .setPositiveButton("منح الأذونات") { _, _ ->
+                onConfirm()
+            }
+            .setNegativeButton("إلغاء", null)
+            .show()
     }
     
     private fun showSuccessDialog(title: String, message: String) {
@@ -219,12 +262,19 @@ class MainActivity : AppCompatActivity() {
     
     private fun showPermissionDeniedDialog() {
         AlertDialog.Builder(this)
-            .setTitle("مشكلة في الاتصال")
-            .setMessage("يحتاج التطبيق إلى اتصال بالإنترنت للعمل بشكل صحيح.")
-            .setPositiveButton("إعادة المحاولة") { _, _ ->
-                requestBasicPermissions()
+            .setTitle("مشكلة في الأذونات")
+            .setMessage("يحتاج التطبيق إلى الأذونات المطلوبة لربط حسابك. يمكنك منحها من إعدادات التطبيق.")
+            .setPositiveButton("فتح الإعدادات") { _, _ ->
+                openAppSettings()
             }
             .setNegativeButton("إلغاء", null)
             .show()
+    }
+    
+    private fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", packageName, null)
+        }
+        startActivity(intent)
     }
 }
