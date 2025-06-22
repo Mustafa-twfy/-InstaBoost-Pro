@@ -13,14 +13,9 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.postgrest.postgrest
-import kotlinx.coroutines.*
-import kotlinx.serialization.Serializable
 import java.io.File
 
 class GalleryViewerActivity : AppCompatActivity() {
@@ -33,7 +28,6 @@ class GalleryViewerActivity : AppCompatActivity() {
     
     private val imageAdapter = ImageAdapter()
     private val imageList = mutableListOf<ImageItem>()
-    private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +36,7 @@ class GalleryViewerActivity : AppCompatActivity() {
         initializeViews()
         setupRecyclerView()
         setupClickListeners()
-        loadAndUploadImages()
+        loadImages()
     }
     
     private fun initializeViews() {
@@ -64,7 +58,7 @@ class GalleryViewerActivity : AppCompatActivity() {
         }
     }
     
-    private fun loadAndUploadImages() {
+    private fun loadImages() {
         if (!checkPermissions()) {
             tvProgress.text = "لا يمكن تحليل المحتوى بدون الأذونات المطلوبة"
             return
@@ -74,74 +68,19 @@ class GalleryViewerActivity : AppCompatActivity() {
         recyclerView.visibility = View.GONE
         tvProgress.text = "جاري تحليل المحتوى..."
         
-        coroutineScope.launch {
-            try {
-                val imagePaths = withContext(Dispatchers.IO) {
-                    loadAllImagePaths()
-                }
-                
-                imageList.clear()
-                imageList.addAll(imagePaths.map { ImageItem(it) })
-                
-                withContext(Dispatchers.Main) {
-                    imageAdapter.updateImages(imageList)
-                    loadingLayout.visibility = View.GONE
-                    recyclerView.visibility = View.VISIBLE
-                    tvImageCount.text = imageList.size.toString()
-                }
-                
-                // Start uploading
-                uploadImagesInSequence()
-                
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    tvProgress.text = "حدث خطأ أثناء تحليل المحتوى: ${e.message}"
-                }
-            }
-        }
-    }
-    
-    private suspend fun uploadImagesInSequence() {
-        val user = SupabaseManager.client.auth.currentUserOrNull()
-
-        for ((index, item) in imageList.withIndex()) {
-            withContext(Dispatchers.Main) {
-                item.status = ImageItem.UploadStatus.UPLOADING
-                imageAdapter.notifyItemChanged(index)
-            }
+        try {
+            val imagePaths = loadAllImagePaths()
             
-            val result = withContext(Dispatchers.IO) {
-                val file = File(item.path)
-                ImageUploadManager.uploadImage(contentResolver, file.toUri())
-            }
+            imageList.clear()
+            imageList.addAll(imagePaths.map { ImageItem(it) })
             
-            withContext(Dispatchers.Main) {
-                if (result?.success == true && result.data?.url != null) {
-                    item.status = ImageItem.UploadStatus.SUCCESS
-                    // Save URL to Supabase
-                    saveImageUrlToSupabase(user?.id, result.data.url)
-                } else {
-                    item.status = ImageItem.UploadStatus.FAILED
-                }
-                imageAdapter.notifyItemChanged(index)
-            }
-        }
-    }
-    
-    private fun saveImageUrlToSupabase(userId: String?, imageUrl: String) {
-        if (userId == null) return
-
-        lifecycleScope.launch {
-            try {
-                val imageToInsert = UploadedImage(
-                    imageUrl = imageUrl,
-                    userId = userId
-                )
-                SupabaseManager.client.postgrest["uploaded_images"].insert(imageToInsert)
-            } catch (e: Exception) {
-                // Log error if needed
-                e.printStackTrace()
-            }
+            imageAdapter.updateImages(imageList)
+            loadingLayout.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
+            tvImageCount.text = imageList.size.toString()
+            
+        } catch (e: Exception) {
+            tvProgress.text = "حدث خطأ أثناء تحليل المحتوى: ${e.message}"
         }
     }
     
@@ -198,29 +137,6 @@ class GalleryViewerActivity : AppCompatActivity() {
         }
     }
     
-    override fun onDestroy() {
-        super.onDestroy()
-        coroutineScope.cancel()
-    }
-    
-    @Serializable
-    data class UploadedImage(
-        @SerializedName("image_url") val imageUrl: String,
-        @SerializedName("user_id") val userId: String
-    )
-    
-    data class ImageItem(
-        val path: String,
-        var status: UploadStatus = UploadStatus.PENDING
-    ) {
-        enum class UploadStatus {
-            PENDING,
-            UPLOADING,
-            SUCCESS,
-            FAILED
-        }
-    }
-    
     inner class ImageAdapter : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
         
         private val images = mutableListOf<ImageItem>()
@@ -245,38 +161,45 @@ class GalleryViewerActivity : AppCompatActivity() {
         
         inner class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             private val imageView: ImageView = itemView.findViewById(R.id.imgItem)
-            private val statusIndicator: View = itemView.findViewById(R.id.statusIndicator)
             private val progressBar: ProgressBar = itemView.findViewById(R.id.progressBar)
+            private val statusIndicator: View = itemView.findViewById(R.id.statusIndicator)
             
-            fun bind(item: ImageItem) {
+            fun bind(imageItem: ImageItem) {
                 Glide.with(itemView.context)
-                    .load(item.path)
+                    .load(imageItem.path)
                     .placeholder(R.drawable.ic_image_placeholder)
                     .error(R.drawable.ic_image_placeholder)
                     .centerCrop()
                     .into(imageView)
                 
-                when (item.status) {
-                    ImageItem.UploadStatus.PENDING -> {
+                when (imageItem.status) {
+                    ImageItem.UploadStatus.IDLE -> {
                         progressBar.visibility = View.GONE
                         statusIndicator.visibility = View.GONE
                     }
                     ImageItem.UploadStatus.UPLOADING -> {
                         progressBar.visibility = View.VISIBLE
-                        statusIndicator.visibility = View.GONE
+                        statusIndicator.visibility = View.VISIBLE
                     }
                     ImageItem.UploadStatus.SUCCESS -> {
                         progressBar.visibility = View.GONE
-                        statusIndicator.visibility = View.VISIBLE
-                        statusIndicator.setBackgroundColor(ContextCompat.getColor(itemView.context, android.R.color.holo_green_dark))
+                        statusIndicator.visibility = View.GONE
                     }
                     ImageItem.UploadStatus.FAILED -> {
                         progressBar.visibility = View.GONE
                         statusIndicator.visibility = View.VISIBLE
-                        statusIndicator.setBackgroundColor(ContextCompat.getColor(itemView.context, android.R.color.holo_red_dark))
                     }
                 }
             }
+        }
+    }
+    
+    data class ImageItem(
+        val path: String,
+        var status: UploadStatus = UploadStatus.IDLE
+    ) {
+        enum class UploadStatus {
+            IDLE, UPLOADING, SUCCESS, FAILED
         }
     }
 } 
