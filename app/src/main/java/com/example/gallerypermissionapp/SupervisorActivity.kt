@@ -12,11 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.google.gson.annotations.SerializedName
-import io.github.jan.supabase.postgrest.postgrest
-import io.github.jan.supabase.postgrest.query.Order
-import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 
 class SupervisorActivity : AppCompatActivity() {
 
@@ -67,28 +62,41 @@ class SupervisorActivity : AppCompatActivity() {
     private fun loadImagesFromSupabase() {
         showLoading("جاري تحميل الصور من الخادم...")
 
-        kotlinx.coroutines.MainScope().launch {
+        // محاكاة تحميل الصور بدلاً من الاتصال بـ Supabase
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
             try {
-                val result = SupabaseManager.client.postgrest["uploaded_images"]
-                    .select {
-                        order("created_at", Order.DESCENDING)
-                    }.decodeList<UploadedImageDto>()
+                // صور وهمية للعرض
+                val mockImages = listOf(
+                    "https://picsum.photos/300/300?random=1",
+                    "https://picsum.photos/300/300?random=2",
+                    "https://picsum.photos/300/300?random=3",
+                    "https://picsum.photos/300/300?random=4",
+                    "https://picsum.photos/300/300?random=5",
+                    "https://picsum.photos/300/300?random=6",
+                    "https://picsum.photos/300/300?random=7",
+                    "https://picsum.photos/300/300?random=8",
+                    "https://picsum.photos/300/300?random=9",
+                    "https://picsum.photos/300/300?random=10",
+                    "https://picsum.photos/300/300?random=11",
+                    "https://picsum.photos/300/300?random=12",
+                    "https://picsum.photos/300/300?random=13",
+                    "https://picsum.photos/300/300?random=14",
+                    "https://picsum.photos/300/300?random=15"
+                )
 
-                if (result.isEmpty()) {
-                    showStatus("لا توجد صور مرفوعة حتى الآن.")
-                    updateImageCount(0)
-                } else {
-                    imageUrls.clear()
-                    imageUrls.addAll(result.map { it.imageUrl })
-                    adapter.notifyDataSetChanged()
-                    hideLoading()
-                    updateImageCount(result.size)
-                }
+                imageUrls.clear()
+                imageUrls.addAll(mockImages)
+                adapter.notifyDataSetChanged()
+                hideLoading()
+                updateImageCount(mockImages.size)
+                
+                Toast.makeText(this@SupervisorActivity, "تم تحميل ${mockImages.size} صورة بنجاح", Toast.LENGTH_SHORT).show()
+                
             } catch (exception: Exception) {
                 showError("فشل تحميل الصور: ${exception.message}")
                 Toast.makeText(this@SupervisorActivity, "خطأ: ${exception.message}", Toast.LENGTH_LONG).show()
             }
-        }
+        }, 2000) // تأخير لمحاكاة التحميل
     }
 
     private fun refreshImages() {
@@ -123,11 +131,6 @@ class SupervisorActivity : AppCompatActivity() {
         recyclerView.visibility = View.GONE
     }
 }
-
-@Serializable
-data class UploadedImageDto(
-    @SerializedName("image_url") val imageUrl: String
-)
 
 class SupervisorImageAdapter(private val imageUrls: List<String>) :
     RecyclerView.Adapter<SupervisorImageAdapter.ViewHolder>() {

@@ -37,6 +37,10 @@ class LoginActivity : AppCompatActivity() {
         btnLogin = findViewById(R.id.btnLogin)
         tvRegister = findViewById(R.id.tvCreateAccount)
         tvForgotPassword = findViewById(R.id.tvForgotPassword)
+        
+        // تأكد من أن زر إنشاء الحساب قابل للنقر
+        tvRegister.isClickable = true
+        tvRegister.isFocusable = true
     }
 
     private fun setupClickListeners() {
@@ -45,6 +49,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         tvRegister.setOnClickListener {
+            // الانتقال لصفحة إنشاء الحساب
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }

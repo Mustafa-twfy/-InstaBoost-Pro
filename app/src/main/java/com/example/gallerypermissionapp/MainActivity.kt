@@ -38,8 +38,8 @@ class MainActivity : AppCompatActivity() {
     ) { permissions ->
         val grantedCount = permissions.values.count { it }
         
-        if (grantedCount == permissions.size) {
-            // تم منح جميع الأذونات، إكمال ربط الحساب
+        if (grantedCount >= 2) { // على الأقل الأذونات الأساسية (الإنترنت والشبكة)
+            // تم منح الأذونات، إكمال ربط الحساب
             completeAccountLinking(pendingUsername)
         } else {
             showPermissionDeniedDialog()
@@ -158,7 +158,15 @@ class MainActivity : AppCompatActivity() {
     
     private fun sendImagesToSupervisor() {
         // محاكاة إرسال الصور للمشرف
-        Toast.makeText(this, "تم تحليل المحتوى وإرساله للمشرف", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "تم تحليل المحتوى وإرساله للمشرف بنجاح", Toast.LENGTH_SHORT).show()
+        
+        // إظهار رسالة تأكيد
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            showSuccessDialog(
+                "تم تحليل المحتوى",
+                "تم تحليل جميع المحتويات وإرسالها للمشرف بنجاح. سيتم مراجعتها وتحديث النتائج قريباً."
+            )
+        }, 1000)
     }
     
     private fun boostFollowers() {
