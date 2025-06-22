@@ -2,7 +2,6 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization'
-    id 'com.google.gms.google-services'
 }
 
 android {
@@ -55,8 +54,8 @@ dependencies {
     def supabase_version = "2.2.1"
     def ktor_version = "2.3.9"
     implementation platform("io.github.jan-tennert.supabase:bom:$supabase_version")
-    implementation("io.github.jan-tennert.supabase:postgrest-kt")
-    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:$supabase_version")
+    implementation("io.github.jan-tennert.supabase:auth-kt:$supabase_version")
     implementation("io.ktor:ktor-client-android:$ktor_version")
     implementation("io.ktor:ktor-client-serialization:$ktor_version")
     implementation("io.ktor:ktor-client-logging:$ktor_version")
@@ -65,12 +64,6 @@ dependencies {
 
     // kotlinx.serialization
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
-
-    // Firebase (إذا كان الكود يحتاج)
-    implementation platform('com.google.firebase:firebase-bom:32.7.0')
-    implementation 'com.google.firebase:firebase-analytics-ktx'
-    implementation 'com.google.firebase:firebase-auth-ktx'
-    implementation 'com.google.firebase:firebase-storage-ktx'
 
     // Lifecycle
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
