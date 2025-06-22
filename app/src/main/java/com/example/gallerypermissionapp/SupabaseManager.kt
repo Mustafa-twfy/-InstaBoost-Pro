@@ -2,7 +2,7 @@ package com.example.gallerypermissionapp
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 
 object SupabaseManager {
@@ -14,7 +14,7 @@ object SupabaseManager {
         supabaseUrl = SUPABASE_URL,
         supabaseKey = SUPABASE_ANON_KEY
     ) {
-        install(GoTrue)
+        install(Auth)
         install(Postgrest)
     }
 } 

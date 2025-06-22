@@ -32,7 +32,7 @@ class RegisterActivity : AppCompatActivity() {
         etEmail = findViewById(R.id.etEmail)
         etPassword = findViewById(R.id.etPassword)
         btnRegister = findViewById(R.id.btnRegister)
-        tvLogin = findViewById(R.id.tvLogin)
+        tvLogin = findViewById(R.id.tvBackToLogin)
     }
 
     private fun setupClickListeners() {

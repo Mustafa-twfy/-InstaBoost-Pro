@@ -82,6 +82,7 @@
     <string name="remember_password">تذكرت كلمة المرور؟</string>
     
     <!-- رسائل التحقق -->
+    <string name="error_fill_fields">يرجى ملء جميع الحقول المطلوبة</string>
     <string name="error_email_required">يرجى إدخال البريد الإلكتروني</string>
     <string name="error_email_invalid">يرجى إدخال بريد إلكتروني صحيح</string>
     <string name="error_password_required">يرجى إدخال كلمة المرور</string>

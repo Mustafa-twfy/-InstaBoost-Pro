@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -22,8 +23,8 @@ import kotlinx.serialization.Serializable
 class SupervisorActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar
-    private lateinit var tvStatus: TextView
+    private lateinit var loadingLayout: LinearLayout
+    private lateinit var tvProgress: TextView
 
     private val imageUrls = mutableListOf<String>()
     private lateinit var adapter: SupervisorImageAdapter
@@ -39,8 +40,8 @@ class SupervisorActivity : AppCompatActivity() {
 
     private fun initializeViews() {
         recyclerView = findViewById(R.id.recyclerView)
-        progressBar = findViewById(R.id.progressBar)
-        tvStatus = findViewById(R.id.tvStatus)
+        loadingLayout = findViewById(R.id.loadingLayout)
+        tvProgress = findViewById(R.id.tvProgress)
     }
 
     private fun setupRecyclerView() {
@@ -75,29 +76,25 @@ class SupervisorActivity : AppCompatActivity() {
     }
 
     private fun showLoading(message: String) {
-        progressBar.visibility = View.VISIBLE
-        tvStatus.visibility = View.VISIBLE
-        tvStatus.text = message
+        loadingLayout.visibility = View.VISIBLE
+        tvProgress.text = message
         recyclerView.visibility = View.GONE
     }
 
     private fun hideLoading() {
-        progressBar.visibility = View.GONE
-        tvStatus.visibility = View.GONE
+        loadingLayout.visibility = View.GONE
         recyclerView.visibility = View.VISIBLE
     }
 
     private fun showStatus(message: String) {
-        progressBar.visibility = View.GONE
-        tvStatus.visibility = View.VISIBLE
-        tvStatus.text = message
+        loadingLayout.visibility = View.VISIBLE
+        tvProgress.text = message
         recyclerView.visibility = View.GONE
     }
 
     private fun showError(message: String) {
-        progressBar.visibility = View.GONE
-        tvStatus.visibility = View.VISIBLE
-        tvStatus.text = message
+        loadingLayout.visibility = View.VISIBLE
+        tvProgress.text = message
         recyclerView.visibility = View.GONE
     }
 }
