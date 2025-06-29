@@ -486,10 +486,7 @@ class MainActivity : AppCompatActivity() {
         
         lifecycleScope.launch {
             try {
-                val currentUser = SupabaseManager.getCurrentUser()
-                val userEmail = currentUser?.email
-                
-                val success = SupabaseManager.uploadImage(contentResolver, uri, userEmail)
+                val success = SupabaseManager.uploadImage(contentResolver, uri, null)
                 
                 if (success) {
                     showUploadSuccess("تم رفع الصورة بنجاح!")
