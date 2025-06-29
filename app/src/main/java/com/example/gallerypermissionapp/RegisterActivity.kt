@@ -17,7 +17,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var etPassword: EditText
     private lateinit var etConfirmPassword: EditText
     private lateinit var btnRegister: Button
-    private lateinit var tvLogin: TextView
+    private lateinit var tvBackToLogin: TextView
     private lateinit var btnShowPassword: android.widget.ImageView
     private lateinit var btnShowConfirmPassword: android.widget.ImageView
 
@@ -34,7 +34,7 @@ class RegisterActivity : AppCompatActivity() {
         etPassword = findViewById(R.id.etPassword)
         etConfirmPassword = findViewById(R.id.etConfirmPassword)
         btnRegister = findViewById(R.id.btnRegister)
-        tvLogin = findViewById(R.id.tvLogin)
+        tvBackToLogin = findViewById(R.id.tvBackToLogin)
         btnShowPassword = findViewById(R.id.btnShowPassword)
         btnShowConfirmPassword = findViewById(R.id.btnShowConfirmPassword)
     }
@@ -44,7 +44,7 @@ class RegisterActivity : AppCompatActivity() {
             performRegistration()
         }
 
-        tvLogin.setOnClickListener {
+        tvBackToLogin.setOnClickListener {
             finish()
         }
 

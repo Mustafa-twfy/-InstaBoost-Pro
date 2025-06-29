@@ -60,6 +60,7 @@
     <string name="password_label">كلمة المرور</string>
     <string name="password_hint">أدخل كلمة المرور</string>
     <string name="login_button">تسجيل الدخول</string>
+    <string name="login">تسجيل الدخول</string>
     <string name="forgot_password">نسيت كلمة المرور؟</string>
     <string name="no_account">ليس لديك حساب؟</string>
     <string name="create_account">إنشاء حساب جديد</string>
@@ -72,6 +73,7 @@
     <string name="confirm_password_label">تأكيد كلمة المرور</string>
     <string name="confirm_password_hint">أعد إدخال كلمة المرور</string>
     <string name="register_button">إنشاء الحساب</string>
+    <string name="register">إنشاء الحساب</string>
     <string name="has_account">لديك حساب بالفعل؟</string>
     <string name="back_to_login">تسجيل الدخول</string>
     
