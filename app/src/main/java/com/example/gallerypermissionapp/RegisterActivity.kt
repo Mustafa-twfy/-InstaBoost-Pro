@@ -9,18 +9,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.providers.builtin.Email
 import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
 
-    private lateinit var etFullName: EditText
     private lateinit var etEmail: EditText
     private lateinit var etPassword: EditText
     private lateinit var etConfirmPassword: EditText
     private lateinit var btnRegister: Button
-    private lateinit var btnBack: android.widget.ImageView
     private lateinit var tvLogin: TextView
     private lateinit var btnShowPassword: android.widget.ImageView
     private lateinit var btnShowConfirmPassword: android.widget.ImageView
@@ -34,25 +30,13 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun initializeViews() {
-        etFullName = findViewById(R.id.etFullName)
         etEmail = findViewById(R.id.etEmail)
         etPassword = findViewById(R.id.etPassword)
         etConfirmPassword = findViewById(R.id.etConfirmPassword)
         btnRegister = findViewById(R.id.btnRegister)
-        btnBack = findViewById(R.id.btnBack)
-        tvLogin = findViewById(R.id.tvBackToLogin)
+        tvLogin = findViewById(R.id.tvLogin)
         btnShowPassword = findViewById(R.id.btnShowPassword)
         btnShowConfirmPassword = findViewById(R.id.btnShowConfirmPassword)
-        
-        // تأكد من أن جميع الأزرار قابلة للنقر
-        btnBack.isClickable = true
-        btnBack.isFocusable = true
-        tvLogin.isClickable = true
-        tvLogin.isFocusable = true
-        btnShowPassword.isClickable = true
-        btnShowPassword.isFocusable = true
-        btnShowConfirmPassword.isClickable = true
-        btnShowConfirmPassword.isFocusable = true
     }
 
     private fun setupClickListeners() {
@@ -60,23 +44,19 @@ class RegisterActivity : AppCompatActivity() {
             performRegistration()
         }
 
-        btnBack.setOnClickListener {
-            finish()
-        }
-
         tvLogin.setOnClickListener {
             finish()
         }
-        
+
         btnShowPassword.setOnClickListener {
             togglePasswordVisibility(etPassword, btnShowPassword)
         }
-        
+
         btnShowConfirmPassword.setOnClickListener {
             togglePasswordVisibility(etConfirmPassword, btnShowConfirmPassword)
         }
     }
-    
+
     private fun togglePasswordVisibility(editText: EditText, button: android.widget.ImageView) {
         if (editText.inputType == android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD) {
             editText.inputType = android.text.InputType.TYPE_CLASS_TEXT
@@ -89,35 +69,50 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun performRegistration() {
-        val fullName = etFullName.text.toString().trim()
         val email = etEmail.text.toString().trim()
         val password = etPassword.text.toString().trim()
         val confirmPassword = etConfirmPassword.text.toString().trim()
 
-        if (fullName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            Toast.makeText(this, getString(R.string.error_fill_fields), Toast.LENGTH_SHORT).show()
+        if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            Toast.makeText(this, "يرجى ملء جميع الحقول", Toast.LENGTH_SHORT).show()
             return
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.error = getString(R.string.error_email_invalid)
+            etEmail.error = "البريد الإلكتروني غير صحيح"
             return
         }
 
         if (password.length < 6) {
-            etPassword.error = getString(R.string.error_password_short)
+            etPassword.error = "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
             return
         }
 
         if (password != confirmPassword) {
-            etConfirmPassword.error = getString(R.string.error_passwords_not_match)
+            etConfirmPassword.error = "كلمة المرور غير متطابقة"
             return
         }
 
-        // Simplified registration for testing - always succeeds
-        Toast.makeText(this@RegisterActivity, getString(R.string.success_register), Toast.LENGTH_LONG).show()
-        
-        // Go back to login screen after successful registration
-        finish()
+        // Show loading
+        btnRegister.isEnabled = false
+        btnRegister.text = "جاري إنشاء الحساب..."
+
+        lifecycleScope.launch {
+            try {
+                val success = SupabaseManager.signUp(email, password)
+                
+                if (success) {
+                    Toast.makeText(this@RegisterActivity, "تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.", Toast.LENGTH_LONG).show()
+                    finish()
+                } else {
+                    Toast.makeText(this@RegisterActivity, "فشل إنشاء الحساب. قد يكون البريد الإلكتروني مستخدم بالفعل.", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@RegisterActivity, "خطأ في الاتصال: ${e.message}", Toast.LENGTH_LONG).show()
+            } finally {
+                btnRegister.isEnabled = true
+                btnRegister.text = getString(R.string.register)
+            }
+        }
     }
 } 

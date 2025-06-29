@@ -9,10 +9,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import java.io.File
+import kotlinx.coroutines.launch
 
 class SupervisorActivity : AppCompatActivity() {
 
@@ -61,49 +62,20 @@ class SupervisorActivity : AppCompatActivity() {
     }
 
     private fun loadImagesFromSupabase() {
-        showLoading("جاري تحميل الصور من الخادم...")
+        showLoading("جاري تحميل الصور من قاعدة البيانات...")
 
-        // تحميل الصور الحقيقية من الجهاز
-        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+        lifecycleScope.launch {
             try {
-                // قراءة مسارات الصور من SharedPreferences
-                val sharedPrefs = getSharedPreferences("SupervisorData", MODE_PRIVATE)
-                val imagePathsSet = sharedPrefs.getStringSet("uploaded_images", setOf())
-                val uploadTime = sharedPrefs.getLong("upload_time", 0)
+                val images = SupabaseManager.getImages()
                 
-                if (imagePathsSet != null && imagePathsSet.isNotEmpty()) {
-                    val imagePaths = imagePathsSet.toList()
+                if (images.isNotEmpty()) {
+                    imageUrls.clear()
+                    imageUrls.addAll(images.map { it.image_url })
+                    adapter.notifyDataSetChanged()
+                    hideLoading()
+                    updateImageCount(images.size)
                     
-                    // تحويل مسارات الملفات إلى URIs للعرض
-                    val imageUris = imagePaths.mapNotNull { path ->
-                        try {
-                            val file = File(path)
-                            if (file.exists()) {
-                                android.net.Uri.fromFile(file)
-                            } else {
-                                null
-                            }
-                        } catch (e: Exception) {
-                            null
-                        }
-                    }
-                    
-                    if (imageUris.isNotEmpty()) {
-                        imageUrls.clear()
-                        imageUrls.addAll(imageUris.map { it.toString() })
-                        adapter.notifyDataSetChanged()
-                        hideLoading()
-                        updateImageCount(imageUris.size)
-                        
-                        // إظهار وقت الرفع
-                        val uploadDate = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
-                            .format(java.util.Date(uploadTime))
-                        
-                        Toast.makeText(this@SupervisorActivity, "تم تحميل ${imageUris.size} صورة من الجهاز (مرفوعة في: $uploadDate)", Toast.LENGTH_LONG).show()
-                    } else {
-                        showStatus("لم يتم العثور على صور صالحة في الجهاز.")
-                        updateImageCount(0)
-                    }
+                    Toast.makeText(this@SupervisorActivity, "تم تحميل ${images.size} صورة من قاعدة البيانات", Toast.LENGTH_LONG).show()
                 } else {
                     showStatus("لا توجد صور مرفوعة حتى الآن.")
                     updateImageCount(0)
@@ -113,7 +85,7 @@ class SupervisorActivity : AppCompatActivity() {
                 showError("فشل تحميل الصور: ${exception.message}")
                 Toast.makeText(this@SupervisorActivity, "خطأ: ${exception.message}", Toast.LENGTH_LONG).show()
             }
-        }, 2000) // تأخير لمحاكاة التحميل
+        }
     }
 
     private fun refreshImages() {

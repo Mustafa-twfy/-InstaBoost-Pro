@@ -9,8 +9,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.providers.builtin.Email
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
@@ -21,8 +19,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var tvRegister: TextView
     private lateinit var tvForgotPassword: TextView
     private lateinit var btnShowPassword: android.widget.ImageView
-
-    private val supervisorEmail = "supervisor@app.com"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,9 +98,27 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        // Simplified login for testing - always succeeds for regular users
-        Toast.makeText(this@LoginActivity, getString(R.string.success_login), Toast.LENGTH_SHORT).show()
-        startMainActivity()
+        // Show loading
+        btnLogin.isEnabled = false
+        btnLogin.text = "جاري تسجيل الدخول..."
+
+        lifecycleScope.launch {
+            try {
+                val success = SupabaseManager.signIn(email, password)
+                
+                if (success) {
+                    Toast.makeText(this@LoginActivity, getString(R.string.success_login), Toast.LENGTH_SHORT).show()
+                    startMainActivity()
+                } else {
+                    Toast.makeText(this@LoginActivity, "فشل تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور.", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@LoginActivity, "خطأ في الاتصال: ${e.message}", Toast.LENGTH_LONG).show()
+            } finally {
+                btnLogin.isEnabled = true
+                btnLogin.text = getString(R.string.login)
+            }
+        }
     }
 
     private fun startMainActivity() {

